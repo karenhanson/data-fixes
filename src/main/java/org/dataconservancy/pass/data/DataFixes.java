@@ -24,6 +24,7 @@ import org.dataconservancy.pass.model.File;
 import org.dataconservancy.pass.model.Repository;
 import org.dataconservancy.pass.model.RepositoryCopy;
 import org.dataconservancy.pass.model.Submission;
+import org.dataconservancy.pass.model.SubmissionEvent;
 
 /*
  * Copyright 2018 Johns Hopkins University
@@ -77,33 +78,38 @@ public class DataFixes {
         
         try {
             //comment these in if you are using dump files
+            
             http = getAuthClient();
             editedDir.mkdirs();
             deletedDir.mkdirs();
             System.out.println("Dumping deleted resources in " + deletedDir.getAbsolutePath());
             System.out.println("Dumping resources prior to editing in " + editedDir.getAbsolutePath());
-            /**/
-            
+
             //comment out once done, but maintain for the record
-            updateJScholarshipRepoFormSchema();   
+            //updateJScholarshipRepoFormSchema();   
             //removeExcessTestSubmission(); 
+            
             
         } catch (Exception ex)  {
             System.err.println("Update failed: " + ex.getMessage());
         }
-    }    
+    }
 
     private static void removeExcessTestSubmission() throws Exception {
-        deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/7d/2c/6b/27/7d2c6b27-991a-42b4-ae1b-0ef5ac0f470e"));
-        deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/2f/c3/ea/a1/2fc3eaa1-8a3f-41c1-b9fc-63c7e050aaf7"));
-        deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/ea/21/1b/06/ea211b06-16c6-4ecd-9d0c-f513beee6d05"));
-        deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/f5/68/fa/c7/f568fac7-092e-4c33-8337-54c60e451f19"));
-        deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/74/11/08/fa/741108fa-926f-46f6-ad88-75cbcc23ba9c"));
+        //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/7d/2c/6b/27/7d2c6b27-991a-42b4-ae1b-0ef5ac0f470e"));
+        //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/2f/c3/ea/a1/2fc3eaa1-8a3f-41c1-b9fc-63c7e050aaf7"));
+        //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/ea/21/1b/06/ea211b06-16c6-4ecd-9d0c-f513beee6d05"));
+        //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/f5/68/fa/c7/f568fac7-092e-4c33-8337-54c60e451f19"));
+        //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/74/11/08/fa/741108fa-926f-46f6-ad88-75cbcc23ba9c"));
         //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/e6/c0/c4/0a/e6c0c40a-d56e-4813-a39c-a48f4b7921bd"));
         //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/1b/e2/a9/0b/1be2a90b-69d9-452a-8549-9e95e097052f"));
         //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/5d/27/ab/2a/5d27ab2a-76af-4800-89e8-cc125d3ba997"));
         //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/8d/9d/a7/45/8d9da745-e7fc-401b-a9ea-5360697c0a5f"));
         //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/fc/7d/ca/3a/fc7dca3a-1ac8-4cea-b8de-c4b66bd3aac7"));
+        //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/04/4c/0a/2e/044c0a2e-43fa-4611-889a-36fd7c104161"));
+        //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/7f/c6/ff/dd/7fc6ffdd-2529-4d3c-a365-991eee0e4170"));
+        //deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/97/fd/e3/36/97fde336-bba5-40dc-8b1e-e695cfab3593"));
+        deleteSubmission(new URI("http://localhost:8080/fcrepo/rest/submissions/2c/86/32/f2/2c8632f2-7b26-4f50-9a64-777577e92d02"));
         
     }
     
@@ -118,6 +124,10 @@ public class DataFixes {
         Set<URI> fileIds = client.findAllByAttribute(File.class, "submission", submissionId);
         fileIds.forEach(delete);
         System.out.println(String.format("Deleted %s Files for Submission %s.", fileIds.size(), submissionId));
+        
+        Set<URI> submissionEventsIds = client.findAllByAttribute(SubmissionEvent.class, "submission", submissionId);
+        submissionEventsIds.forEach(delete);
+        System.out.println(String.format("Deleted %s SubmissionEvents for Submission %s.", submissionEventsIds.size(), submissionId));
         
         //check if other submissions reference same publication. if not can delete the pub and repocopies
         Set<URI> pubSubmissionIds = client.findAllByAttribute(Submission.class, "publication", submission.getPublication());
@@ -142,7 +152,7 @@ public class DataFixes {
         String formSchema = "{"  
                     + "\"id\":\"JScholarship\","
                     + "\"schema\":{"
-                       + "\"title\":\"Johns Hopkins - JScholarship <br><p class='lead text-muted'>Deposit requirements for JH's institutional repository JScholarship.</p>\","
+                       + "\"title\":\"Deposit Details - JScholarship <br><p class='lead text-muted'>Please provide the information and agreement required for JScholarship deposit.</p> <p class='lead text-muted'> <i class='glyphicon glyphicon-info-sign'></i> Fields that are not editable were populated using information associated with the provided DOI or were provided in a previous step. To edit authors list, please go back to the &#34;Publication Details&#34; page via the &#34;Back&#34; button below.</p>\","
                        + "\"type\":\"object\","
                        + "\"properties\":{"
                           + "\"authors\":{"
